@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>名片成效</title>
+<style>
+  :root{
+    --navy:#253043; --navy-d:#1E2838; --navy-3:#33415C;
+    --copper:#C4835A; --copper-l:#DFA77C;
+    --beige:#F5F1E8; --white:#fff; --muted:#A0AAB8;
+    --line:#E4DED1; --ink:#253043;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--beige); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",
+                "PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:15px; line-height:1.6; padding-bottom:40px;
+  }
+  .wrap{max-width:480px;margin:0 auto}
+
+  /* ── 標頭 ── */
+  header{
+    background:var(--navy); color:#fff;
+    padding:26px 22px 30px;
+    border-radius:0 0 26px 26px;
+  }
+  .who{font-size:12.5px;color:var(--muted);letter-spacing:.04em}
+  .who b{color:var(--copper-l);font-weight:600}
+  h1{margin:12px 0 4px;font-size:19px;font-weight:600;letter-spacing:.01em}
+  .lead{margin:0;font-size:13px;color:#C9D2DE}
+
+  /* 主數字 */
+  .hero-num{
+    display:flex;align-items:baseline;gap:8px;margin:22px 0 2px;
+  }
+  .hero-num b{
+    font-size:52px;line-height:1;font-weight:700;color:var(--copper-l);
+    font-variant-numeric:tabular-nums;
+  }
+  .hero-num span{font-size:14px;color:#C9D2DE}
+  .hero-sub{font-size:12.5px;color:var(--muted);margin:0}
+
+  /* ── 卡片 ── */
+  section{padding:0 16px;margin-top:18px}
+  .card{
+    background:#fff;border-radius:18px;padding:4px 0;
+    box-shadow:0 1px 2px rgba(37,48,67,.06),0 6px 18px rgba(37,48,67,.05);
+  }
+  .row{
+    display:flex;align-items:center;gap:14px;
+    padding:15px 18px;border-bottom:1px solid var(--line);
+  }
+  .row:last-child{border-bottom:0}
+  .row .ic{
+    width:38px;height:38px;flex:0 0 38px;border-radius:11px;
+    background:#F3EFE6;display:flex;align-items:center;justify-content:center;
+    font-size:17px;
+  }
+  .row .tx{flex:1;min-width:0}
+  .row .tx .t{font-size:14.5px;font-weight:600}
+  .row .tx .s{font-size:12.5px;color:#7A8699;margin-top:1px}
+  .row .n{
+    font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;
+    color:var(--navy);letter-spacing:-.01em;
+  }
+  .row .n small{font-size:11.5px;font-weight:500;color:var(--muted);margin-left:2px}
+
+  /* ── 標題條 ── */
+  .sec-h{
+    display:flex;align-items:center;gap:9px;
+    margin:26px 0 9px;padding:0 2px;
+  }
+  .sec-h .bar{width:3px;height:15px;background:var(--copper);border-radius:2px}
+  .sec-h .lb{font-size:12.5px;font-weight:600;letter-spacing:.06em;color:#6B7789}
+
+  /* ── 建議聯絡 ── */
+  .alert{
+    background:linear-gradient(180deg,#2C3A50,#253043);
+    border-radius:18px;padding:18px;color:#fff;
+  }
+  .alert .tag{
+    display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;
+    color:#253043;background:var(--copper-l);border-radius:999px;
+    padding:3px 9px;margin-bottom:11px;
+  }
+  .alert .big{font-size:16px;font-weight:600;line-height:1.5;margin:0 0 6px}
+  .alert .big em{font-style:normal;color:var(--copper-l)}
+  .alert .sm{font-size:12.5px;color:#B9C4D2;margin:0}
+
+  /* ── 空狀態 ── */
+  .empty{
+    background:#fff;border-radius:18px;padding:34px 22px;text-align:center;
+    box-shadow:0 1px 2px rgba(37,48,67,.06),0 6px 18px rgba(37,48,67,.05);
+  }
+  .empty .e{font-size:30px;margin-bottom:10px}
+  .empty .t{font-size:15px;font-weight:600;margin:0 0 5px}
+  .empty .s{font-size:13px;color:#7A8699;margin:0}
+
+  /* ── 近期動態 ── */
+  .ev{display:flex;align-items:center;gap:11px;padding:11px 18px;border-bottom:1px solid var(--line)}
+  .ev:last-child{border-bottom:0}
+  .ev .dot{width:7px;height:7px;border-radius:50%;background:var(--copper);flex:0 0 7px}
+  .ev .w{flex:1;font-size:13.5px}
+  .ev .when{font-size:12px;color:var(--muted);white-space:nowrap}
+
+  footer{
+    text-align:center;font-size:11.5px;color:#9AA3B0;
+    padding:28px 20px 8px;line-height:1.7;
+  }
+  .skel{background:#EDE8DE;border-radius:6px;color:transparent}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="who" id="who">名片成效</div>
+    <h1>誰對你有興趣</h1>
+    <p class="lead">有人點你的名片，這裡就會多一筆。你不用打字。</p>
+    <div class="hero-num"><b id="wk">–</b><span>個人本週點過你的名片</span></div>
+    <p class="hero-sub" id="wksub">載入中…</p>
+  </header>
+
+  <section>
+    <div class="sec-h"><i class="bar"></i><span class="lb">他們看了什麼</span></div>
+    <div class="card" id="clicks"></div>
+  </section>
+
+  <section id="alertWrap" style="display:none">
+    <div class="sec-h"><i class="bar"></i><span class="lb">建議現在做的事</span></div>
+    <div class="alert">
+      <span class="tag">建議聯絡</span>
+      <p class="big" id="alertBig"></p>
+      <p class="sm" id="alertSm"></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><i class="bar"></i><span class="lb">最近動態</span></div>
+    <div class="card" id="recent"></div>
+  </section>
+
+  <footer>
+    名片成效看板 · 只記錄點擊行為，不記錄姓名與電話<br>
+    資料可隨時要求刪除
+  </footer>
+</div>
+
+<script>
+/* ── 設定 ────────────────────────────────────────────────────────
+   API 留空＝與本頁同源（本機測試用）。
+   正式上線時填 Apps Script 網址，例如：
+   const API = 'https://script.google.com/macros/s/AKfy.../exec';      */
+const API = 'https://script.google.com/macros/s/AKfycbz6-2txbuJk2l3xJCWM7KoemrFPM-rpZuxvcd2A8Jk126LTu5qhBZgup7dicVsA3649/exec';
+// uid 由中繼頁（?dash=1）放進 sessionStorage；取完立刻移除，不留在瀏覽器。
+// 讀不到就請使用者從 LINE 開啟，不預設任何 slug、不顯示示範資料。
+const UID = sessionStorage.getItem('ecard_uid') || '';
+sessionStorage.removeItem('ecard_uid');
+
+const NAMES = { ig:'看了你的作品', line:'加你的 LINE', map:'按了導航',
+                fb:'看了你的 Facebook', tel:'直接打給你', page:'打開了完整名片',
+                share:'把你的名片轉給別人' };
+const ICONS = { ig:'📷', line:'💬', map:'📍', fb:'👍', tel:'📞', page:'📇', share:'🔁' };
+
+// 有 API（Apps Script 網址）就直接接 ?stats=…；同源本機測試則打根路徑 /?stats=…
+function api(path){ return API ? API + path : '/' + path; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function ago(ts){
+  const d = Date.now() - ts;
+  if (d < 60e3) return '剛剛';
+  if (d < 3600e3) return Math.floor(d/60e3) + ' 分鐘前';
+  if (d < 86400e3) return Math.floor(d/3600e3) + ' 小時前';
+  return Math.floor(d/86400e3) + ' 天前';
+}
+
+function render(d){
+  document.getElementById('wk').textContent = d.week_visitors ?? 0;
+  document.getElementById('wksub').textContent =
+    (d.total ? '累計 ' + d.total + ' 次點擊 · ' + d.visitors + ' 個人看過'
+             : '還沒有人點過，把名片傳出去吧');
+
+  // 他們看了什麼
+  const clicks = d.clicks || {};
+  const keys = Object.keys(clicks).sort((a,b) => clicks[b] - clicks[a]);
+  const box = document.getElementById('clicks');
+  if (!keys.length){
+    box.innerHTML = '<div class="row"><div class="tx"><div class="t">還沒有紀錄</div>' +
+      '<div class="s">有人點名片上的按鈕時，這裡會出現</div></div></div>';
+  } else {
+    box.innerHTML = keys.map(k => `
+      <div class="row">
+        <div class="ic">${ICONS[k] || '•'}</div>
+        <div class="tx"><div class="t">${esc(NAMES[k] || k)}</div>
+          <div class="s">共 ${clicks[k]} 次</div></div>
+        <div class="n">${clicks[k]}<small>次</small></div>
+      </div>`).join('');
+  }
+
+  // 建議聯絡
+  const n = d.returners || 0, top = d.top_returner || 0;
+  if (n > 0){
+    document.getElementById('alertWrap').style.display = '';
+    document.getElementById('alertBig').innerHTML =
+      `有 <em>${n}</em> 個人回來看過不只一次。`;
+    document.getElementById('alertSm').textContent =
+      top >= 3 ? `其中有人看了 ${top} 次 —— 這通常代表他正在考慮，值得你主動打一通電話。`
+               : '重複回來看通常代表有興趣，可以在今天的主動聯絡名單裡排前面。';
+  }
+
+  // 最近動態
+  const rec = (d.recent || []).slice(0, 8);
+  document.getElementById('recent').innerHTML = rec.length
+    ? rec.map(e => `<div class="ev"><i class="dot"></i>
+        <span class="w">有人${esc(NAMES[e.target] || e.target || '點了名片')}</span>
+        <span class="when">${ago(e.ts)}</span></div>`).join('')
+    : '<div class="ev"><span class="w" style="color:#7A8699">還沒有動態</span></div>';
+}
+
+function showMsg(title, sub){
+  document.getElementById('wk').textContent = '–';
+  document.getElementById('wksub').textContent = title;
+  document.getElementById('clicks').innerHTML =
+    '<div class="row"><div class="tx"><div class="t">' + esc(title) + '</div>' +
+    (sub ? '<div class="s">' + esc(sub) + '</div>' : '') + '</div></div>';
+  document.getElementById('recent').innerHTML = '';
+}
+
+// 尚未綁定：顯示綁定碼輸入框，送出 POST /bind，成功後重新載入資料
+function showBind(){
+  showMsg('請輸入綁定碼');
+  document.getElementById('clicks').innerHTML =
+    '<div class="row" style="flex-direction:column;align-items:stretch">' +
+    '<div class="t" style="font-weight:600">請輸入綁定碼</div>' +
+    '<input id="code" maxlength="8" autocomplete="off" autocapitalize="characters" ' +
+      'style="font-size:20px;letter-spacing:.2em;text-align:center;padding:10px;' +
+      'border:1px solid var(--line);border-radius:10px;text-transform:uppercase">' +
+    '<button id="bindBtn" style="padding:11px;border:0;border-radius:10px;' +
+      'background:var(--navy);color:#fff;font-size:15px">送出</button>' +
+    '<div class="s" id="bindErr" style="color:#B3261E"></div></div>';
+  document.getElementById('bindBtn').onclick = () => {
+    const code = document.getElementById('code').value.trim();
+    const err = document.getElementById('bindErr');
+    if (!code){ err.textContent = '請輸入綁定碼'; return; }
+    err.textContent = '送出中…';
+    fetch(API ? API + '?action=bind' : '/bind', {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},   // 避開 CORS preflight（Apps Script）
+      body: JSON.stringify({code: code, uid: UID})
+    }).then(r => r.json()).then(d => {
+      if (d && d.ok) return load();
+      err.textContent = d && d.error === 'invalid_code'
+        ? '綁定碼不正確或已使用過' : '綁定失敗，請稍後再試';
+    }).catch(() => { err.textContent = '連線失敗，請稍後再試'; });
+  };
+}
+
+function load(){
+  return fetch(api('?dash=' + encodeURIComponent(UID))).then(r => r.json())
+    .then(d => {
+      if (!d || d.ok === false) throw new Error(d && d.error || 'stats error');
+      if (!d.bound) return showBind();
+      render(d);
+    })
+    .catch(e => {
+      document.getElementById('wksub').textContent = '讀不到資料（' + e.message + '）';
+      document.getElementById('clicks').innerHTML =
+        '<div class="row"><div class="tx"><div class="t">連線失敗</div>' +
+        '<div class="s">請確認後端網址是否正確</div></div></div>';
+      document.getElementById('recent').innerHTML = '';
+    });
+}
+
+if (UID) load();
+else showMsg('請從 LINE 開啟這個頁面');
+</script>
+</body>
+</html>
