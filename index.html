@@ -68,6 +68,18 @@
   }
   .row .n small{font-size:11.5px;font-weight:500;color:var(--muted);margin-left:2px}
 
+  /* ── 訪客清單 ── */
+  .vis .av{
+    width:40px;height:40px;flex:0 0 40px;border-radius:50%;overflow:hidden;
+    background:#9AA3B0;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:17px;font-weight:700;
+  }
+  .vis .av img{width:100%;height:100%;object-fit:cover;display:block}
+  .vis .tx .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vis .tx .s{line-height:1.4}
+  .vis .rt{text-align:right;flex:0 0 auto;font-size:12px;color:var(--muted);white-space:nowrap}
+  .vis .rt b{display:block;font-weight:500;color:var(--navy);margin-top:2px}
+
   /* ── 標題條 ── */
   .sec-h{
     display:flex;align-items:center;gap:9px;
@@ -128,6 +140,11 @@
     <div class="card" id="clicks"></div>
   </section>
 
+  <section>
+    <div class="sec-h"><i class="bar"></i><span class="lb">最近的訪客</span></div>
+    <div class="card" id="visitors"></div>
+  </section>
+
   <section id="alertWrap" style="display:none">
     <div class="sec-h"><i class="bar"></i><span class="lb">建議現在做的事</span></div>
     <div class="alert">
@@ -143,7 +160,7 @@
   </section>
 
   <footer>
-    名片成效看板 · 只記錄點擊行為，不記錄姓名與電話<br>
+    名片成效看板 · 本看板記錄訪客的 LINE 顯示名稱與點擊行為，用於名片主人的客戶跟進。不記錄電話與 Email。<br>
     資料可隨時要求刪除
   </footer>
 </div>
@@ -198,6 +215,38 @@ function render(d){
           <div class="s">共 ${clicks[k]} 次</div></div>
         <div class="n">${clicks[k]}<small>次</small></div>
       </div>`).join('');
+  }
+
+  // 訪客清單
+  const vl = d.visitor_list || [];
+  const vbox = document.getElementById('visitors');
+  if (!vl.length){
+    vbox.innerHTML = '<div class="row"><div class="tx"><div class="t">還沒有人點過，把名片傳出去吧</div></div></div>';
+  } else {
+    vbox.innerHTML = vl.map(v => {
+      const pic = /^https:\/\//.test(v.pic || '') ? v.pic : '';
+      const nm = v.name || '';
+      const letter = nm ? Array.from(nm)[0] : '?';
+      let bg = '#9AA3B0';
+      if (nm){
+        let sum = 0;
+        for (const ch of nm) sum += ch.codePointAt(0);
+        const h = [212, 28, 200, 35, 222, 18, 190, 40][sum % 8]; // 藍／銅色系色相
+        bg = `hsl(${h}, 38%, 48%)`;
+      }
+      const av = pic
+        ? `<img src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.textContent=this.parentNode.dataset.l">`
+        : esc(letter);
+      const did = Object.keys(v.targets || {}).sort((a,b) => v.targets[b] - v.targets[a])
+        .map(k => NAMES[k] || k).join('、');
+      return `
+      <div class="row vis">
+        <div class="av" data-l="${esc(letter)}" style="background:${bg}">${av}</div>
+        <div class="tx"><div class="t">${esc(v.name || '未具名訪客')}</div>
+          <div class="s">${esc(did || '點了名片')}</div></div>
+        <div class="rt">${ago(v.last_ts)}<b>看過 ${v.count || 1} 次</b></div>
+      </div>`;
+    }).join('');
   }
 
   // 建議聯絡
