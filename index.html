@@ -42,6 +42,16 @@
   }
   .hero-num span{font-size:14px;color:#C9D2DE}
   .hero-sub{font-size:12.5px;color:var(--muted);margin:0}
+  .sub-stats{display:flex;gap:10px;margin:14px 0 10px}
+  .sub-stat{
+    flex:1;display:flex;align-items:baseline;gap:7px;
+    background:var(--navy-3);border-radius:14px;padding:10px 14px;
+  }
+  .sub-stat b{
+    font-size:24px;line-height:1;font-weight:700;color:var(--copper-l);
+    font-variant-numeric:tabular-nums;
+  }
+  .sub-stat span{font-size:12.5px;color:#C9D2DE}
 
   /* ── 卡片 ── */
   section{padding:0 16px;margin-top:18px}
@@ -132,6 +142,9 @@
     <h1>誰對你有興趣</h1>
     <p class="lead">有人點你的名片，這裡就會多一筆。你不用打字。</p>
     <div class="hero-num"><b id="wk">–</b><span>個人本週點過你的名片</span></div>
+    <div class="sub-stats">
+      <div class="sub-stat"><b id="views">–</b><span>名片頁被開啟次數</span></div>
+    </div>
     <p class="hero-sub" id="wksub">載入中…</p>
   </header>
 
@@ -160,7 +173,7 @@
   </section>
 
   <footer>
-    名片成效看板 · 本看板記錄訪客的 LINE 顯示名稱與點擊行為，用於名片主人的客戶跟進。不記錄電話與 Email。<br>
+    名片成效看板 · 本看板記錄訪客的 LINE 顯示名稱與點擊行為，以及名片頁被開啟的次數（匿名，不含個人資料），用於名片主人的客戶跟進。不記錄電話與 Email。<br>
     資料可隨時要求刪除
   </footer>
 </div>
@@ -203,6 +216,7 @@ function render(d){
   document.getElementById('wksub').textContent =
     (d.total ? '累計 ' + d.total + ' 次點擊 · ' + d.visitors + ' 個人看過'
              : '還沒有人點過，把名片傳出去吧');
+  document.getElementById('views').textContent = d.views ?? 0;
 
   // 他們看了什麼
   const clicks = d.clicks || {};
