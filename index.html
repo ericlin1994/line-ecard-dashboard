@@ -212,15 +212,19 @@ function ago(ts){
 }
 
 function render(d){
+  const clicks = d.clicks || {};
+  // 新後端回 d.views；舊後端沒有這個欄位，view 事件會落在 clicks.view
+  const viewCount = (typeof d.views === 'number') ? d.views : (clicks.view || 0);
+  // 舊後端的 total 把 view 也算進去了，扣掉才是真正的「點擊次數」
+  const clickTotal = Math.max(0, (d.total || 0) - (clicks.view || 0));
   document.getElementById('wk').textContent = d.week_visitors ?? 0;
   document.getElementById('wksub').textContent =
-    (d.total ? '累計 ' + d.total + ' 次點擊 · ' + d.visitors + ' 個人看過'
+    (clickTotal ? '累計 ' + clickTotal + ' 次點擊 · ' + d.visitors + ' 個人看過'
              : '還沒有人點過，把名片傳出去吧');
-  document.getElementById('views').textContent = d.views ?? 0;
+  document.getElementById('views').textContent = viewCount;
 
   // 他們看了什麼
-  const clicks = d.clicks || {};
-  const keys = Object.keys(clicks).sort((a,b) => clicks[b] - clicks[a]);
+  const keys = Object.keys(clicks).filter(k => k !== 'view').sort((a,b) => clicks[b] - clicks[a]);
   const box = document.getElementById('clicks');
   if (!keys.length){
     box.innerHTML = '<div class="row"><div class="tx"><div class="t">還沒有紀錄</div>' +
@@ -236,7 +240,12 @@ function render(d){
   }
 
   // 訪客清單
-  const vl = d.visitor_list || [];
+  const vl = (d.visitor_list || []).map(v => {
+    const t = Object.assign({}, v.targets || {});
+    const vv = t.view || 0;
+    delete t.view;
+    return Object.assign({}, v, { targets: t, count: Math.max(0, (v.count || 0) - vv) });
+  }).filter(v => v.count > 0);
   const vbox = document.getElementById('visitors');
   if (!vl.length){
     vbox.innerHTML = '<div class="row"><div class="tx"><div class="t">還沒有人點過，把名片傳出去吧</div></div></div>';
@@ -279,7 +288,7 @@ function render(d){
   }
 
   // 最近動態
-  const rec = (d.recent || []).slice(0, 8);
+  const rec = (d.recent || []).filter(e => e.target !== 'view').slice(0, 8);
   document.getElementById('recent').innerHTML = rec.length
     ? rec.map(e => `<div class="ev"><i class="dot"></i>
         <span class="w">有人${esc(NAMES[e.target] || e.target || '點了名片')}</span>
