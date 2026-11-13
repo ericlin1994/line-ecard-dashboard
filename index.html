@@ -194,9 +194,11 @@ const NAMES = { ig:'看了你的作品', line:'加你的 LINE', map:'按了導�
                 share:'把你的名片轉給別人',
                 service:'看了你的服務項目', svc_lecture:'想邀約你演講',
                 svc_engineer:'有工程需求想找你', svc_loan:'想跟你聊貸款', svc_biz:'企業主想問資源',
-                qr_scan:'掃描 QR 進站' };
+                qr_scan:'掃描 QR 進站',
+                web:'看了你的官方網站', market:'查了房價行情', booking:'線上預約' };
 const ICONS = { ig:'📷', line:'💬', map:'📍', fb:'👍', tel:'📞', page:'📇', share:'🔁',
-                service:'🧰', svc_lecture:'🎤', svc_engineer:'🛠️', svc_loan:'🧮', svc_biz:'🏢' };
+                service:'🧰', svc_lecture:'🎤', svc_engineer:'🛠️', svc_loan:'🧮', svc_biz:'🏢',
+                web:'🌐', market:'🏠', booking:'📅' };
 
 // 有 API（Apps Script 網址）就直接接 ?stats=…；同源本機測試則打根路徑 /?stats=…
 function api(path){ return API ? API + path : '/' + path; }
