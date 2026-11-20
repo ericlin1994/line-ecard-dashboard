@@ -259,11 +259,12 @@ function render(d){
     delete t.view;
     return Object.assign({}, v, { targets: t, count: Math.max(0, (v.count || 0) - vv) });
   }).filter(v => v.count > 0);
-  const vl = rawVl.filter(v => v.name);
+  const vl = rawVl.filter(v => !v.anon && v.name);
   // 匿名者（拿不到 LINE 身分）不能混進清單假裝成「一個訪客」—— 合成一列單獨說明。
   // 後端把 uid 為空的事件全歸成同一組，所以那是「事件筆數」不是「同一個人看很多次」。
-  const anon = rawVl.filter(v => !v.name);
+  const anon = rawVl.filter(v => v.anon || !v.name);
   const anonCount = anon.reduce((s, v) => s + (v.count || 0), 0);
+  const anonDevs  = anon.reduce((s, v) => s + (v.devices || 0), 0);
   const anonLast = anon.reduce((s, v) => Math.max(s, v.last_ts || 0), 0);
   const anonT = {};
   anon.forEach(v => Object.keys(v.targets || {}).forEach(k => { anonT[k] = (anonT[k] || 0) + v.targets[k]; }));
@@ -297,7 +298,7 @@ function render(d){
         <div class="av" data-l="?" style="background:#9AA3B0">?</div>
         <div class="tx"><div class="t">匿名訪客</div>
           <div class="s">未取得 LINE 身分（多為在 LINE 外開啟）· ${esc(anonDid || '點了名片')}</div></div>
-        <div class="rt">${ago(anonLast)}<b>${anonCount} 筆點擊</b></div>
+        <div class="rt">${ago(anonLast)}<b>${anonDevs ? anonDevs + ' 位匿名訪客・' : ''}${anonCount} 筆點擊</b></div>
       </div>` : '');
   }
 
