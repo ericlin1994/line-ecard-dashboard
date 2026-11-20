@@ -143,7 +143,8 @@
     <p class="lead">有人點你的名片，這裡就會多一筆。你不用打字。</p>
     <div class="hero-num"><b id="wk">–</b><span>個人本週點過你的名片</span></div>
     <div class="sub-stats">
-      <div class="sub-stat"><b id="views">–</b><span>名片頁被開啟次數</span></div>
+      <div class="sub-stat"><b id="views">–</b><span>名片頁被開啟筆數</span></div>
+      <div class="sub-stat"><b id="pv">–</b><span>不重複來訪人數</span></div>
     </div>
     <p class="hero-sub" id="wksub">載入中…</p>
   </header>
@@ -173,7 +174,7 @@
   </section>
 
   <footer>
-    名片成效看板 · 本看板記錄訪客的 LINE 顯示名稱與點擊行為，以及名片頁被開啟的次數（匿名，不含個人資料），用於名片主人的客戶跟進。不記錄電話與 Email。<br>
+    名片成效看板 · 本看板記錄訪客的 LINE 顯示名稱與點擊行為，以及名片頁被開啟的筆數與不重複來訪人數（以瀏覽器隨機代碼計算，不含個人資料），用於名片主人的客戶跟進。不記錄電話與 Email。<br>
     資料可隨時要求刪除
   </footer>
 </div>
@@ -221,9 +222,19 @@ function render(d){
   const clickTotal = Math.max(0, (d.total || 0) - (clicks.view || 0));
   document.getElementById('wk').textContent = d.week_visitors ?? 0;
   document.getElementById('wksub').textContent =
-    (clickTotal ? '累計 ' + clickTotal + ' 次點擊 · ' + d.visitors + ' 個人看過'
+    (clickTotal ? '累計 ' + clickTotal + ' 次點擊'
              : '還沒有人點過，把名片傳出去吧');
   document.getElementById('views').textContent = viewCount;
+  // 名片頁的兩個數字改用公開端點 ?pub=，與名片頁頁尾同一組定義
+  // （筆數＝頁面被開啟次數；人數＝不重複來訪者：匿名裝置碼＋LINE 身分去重）
+  if (d.slug){
+    fetch(api('?pub=' + encodeURIComponent(d.slug))).then(r => r.json()).then(p => {
+      if (p && p.ok){
+        document.getElementById('views').textContent = p.views;
+        document.getElementById('pv').textContent = p.visitors;
+      }
+    }).catch(() => {});
+  }
 
   // 他們看了什麼
   const keys = Object.keys(clicks).filter(k => k !== 'view').sort((a,b) => clicks[b] - clicks[a]);
