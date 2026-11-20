@@ -252,28 +252,34 @@ function render(d){
       </div>`).join('');
   }
 
-  // 訪客清單
-  const vl = (d.visitor_list || []).map(v => {
+  // 訪客清單：只列「有 LINE 身分、可以跟進」的訪客
+  const rawVl = (d.visitor_list || []).map(v => {
     const t = Object.assign({}, v.targets || {});
     const vv = t.view || 0;
     delete t.view;
     return Object.assign({}, v, { targets: t, count: Math.max(0, (v.count || 0) - vv) });
   }).filter(v => v.count > 0);
+  const vl = rawVl.filter(v => v.name);
+  // 匿名者（拿不到 LINE 身分）不能混進清單假裝成「一個訪客」—— 合成一列單獨說明。
+  // 後端把 uid 為空的事件全歸成同一組，所以那是「事件筆數」不是「同一個人看很多次」。
+  const anon = rawVl.filter(v => !v.name);
+  const anonCount = anon.reduce((s, v) => s + (v.count || 0), 0);
+  const anonLast = anon.reduce((s, v) => Math.max(s, v.last_ts || 0), 0);
+  const anonT = {};
+  anon.forEach(v => Object.keys(v.targets || {}).forEach(k => { anonT[k] = (anonT[k] || 0) + v.targets[k]; }));
+  const anonDid = Object.keys(anonT).sort((a,b) => anonT[b] - anonT[a]).map(k => NAMES[k] || k).join('、');
   const vbox = document.getElementById('visitors');
-  if (!vl.length){
+  if (!vl.length && !anonCount){
     vbox.innerHTML = '<div class="row"><div class="tx"><div class="t">還沒有人點過，把名片傳出去吧</div></div></div>';
   } else {
     vbox.innerHTML = vl.map(v => {
       const pic = /^https:\/\//.test(v.pic || '') ? v.pic : '';
-      const nm = v.name || '';
-      const letter = nm ? Array.from(nm)[0] : '?';
-      let bg = '#9AA3B0';
-      if (nm){
-        let sum = 0;
-        for (const ch of nm) sum += ch.codePointAt(0);
-        const h = [212, 28, 200, 35, 222, 18, 190, 40][sum % 8]; // 藍／銅色系色相
-        bg = `hsl(${h}, 38%, 48%)`;
-      }
+      const nm = v.name;
+      const letter = Array.from(nm)[0];
+      let sum = 0;
+      for (const ch of nm) sum += ch.codePointAt(0);
+      const h = [212, 28, 200, 35, 222, 18, 190, 40][sum % 8]; // 藍／銅色系色相
+      const bg = `hsl(${h}, 38%, 48%)`;
       const av = pic
         ? `<img src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.textContent=this.parentNode.dataset.l">`
         : esc(letter);
@@ -282,11 +288,17 @@ function render(d){
       return `
       <div class="row vis">
         <div class="av" data-l="${esc(letter)}" style="background:${bg}">${av}</div>
-        <div class="tx"><div class="t">${esc(v.name || '未具名訪客')}</div>
+        <div class="tx"><div class="t">${esc(nm)}</div>
           <div class="s">${esc(did || '點了名片')}</div></div>
         <div class="rt">${ago(v.last_ts)}<b>看過 ${v.count || 1} 次</b></div>
       </div>`;
-    }).join('');
+    }).join('') + (anonCount ? `
+      <div class="row vis">
+        <div class="av" data-l="?" style="background:#9AA3B0">?</div>
+        <div class="tx"><div class="t">匿名訪客</div>
+          <div class="s">未取得 LINE 身分（在 LINE 外開啟）· ${esc(anonDid || '點了名片')}</div></div>
+        <div class="rt">${ago(anonLast)}<b>${anonCount} 筆點擊</b></div>
+      </div>` : '');
   }
 
   // 建議聯絡
